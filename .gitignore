@@ -1,0 +1,33 @@
+# Mengabaikan file hasil compile Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+server
+
+# === Secrets & Configurations ===
+.env
+
+# === Dependencies ===
+vendor/
+
+# === IDE & Editors ===
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains (GoLand)
+.idea/
+
+# === Logs ===
+*.log
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === Docker ===
+pgdata/
+redisdata/

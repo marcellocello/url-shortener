@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 class="text-3xl font-extrabold text-blue-600 mb-6 text-center">URL Shortener</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Full URL</label>
+                <input type="text" id="url" placeholder="https://example.com" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Custom Alias <i>(opsional)</i></label>
+                <input type="text" id="custom" placeholder="misal: link-saya" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <button onclick="process()" 
+                    class="w-full bg-blue-600 text-white font-bold py-2 rounded-md hover:bg-blue-700 transition duration-200">
+                Proses
+            </button>
+        </div>
+
+	<div id="result" class="mt-6 hidden p-4 bg-blue-50 rounded-md border border-blue-200">
+            <p class="text-sm text-blue-800">Hasil URL Shortener:</p>
+            <a id="shortLink" href="#" target="_blank" class="text-lg font-bold text-blue-600 break-all underline"></a>
+        </div>
+
+	<div class="mt-10 w-full max-w-2xl">
+    		<h2 class="text-xl font-bold mb-4">TOP 5 Link</h2>
+    		<table class="w-full bg-white rounded-lg shadow overflow-hidden">
+        		<thead class="bg-gray-200">
+            			<tr>
+                			<th class="p-3 text-left">Alias</th>
+                			<th class="p-3 text-left">Klik</th>
+            			</tr>
+        		</thead>
+        		<tbody>
+            			{{ range .Links }}
+            			<tr class="border-t">
+        				<td class="p-3">/r/{{ .ShortCode }}</td>
+                			<td class="p-3 font-bold text-blue-600">{{ .VisitCount }}</td>
+    				</tr>
+            			{{ end }}
+        		</tbody>
+    		</table>
+	</div>
+    </div>
+
+    <script>
+        async function process() {
+            const urlValue = document.getElementById('url').value;
+            const customValue = document.getElementById('custom').value;
+            const resultDiv = document.getElementById('result');
+            const shortLink = document.getElementById('shortLink');
+
+            const response = await fetch('/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlValue, custom_code: customValue })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                shortLink.href = data.short_url;
+                shortLink.innerText = data.short_url;
+                resultDiv.classList.remove('hidden');
+            } else {
+                alert("Error: " + (data.error || "Gagal membuat link"));
+            }
+        }
+    </script>
+</body>
+</html>
