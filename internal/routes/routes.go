@@ -17,8 +17,16 @@ func SetupRouter(db *storage.DB, rdb *storage.RedisClient) *gin.Engine {
 	limiter := tollbooth.NewLimiter(1, nil)
 
 	r.GET("/", func(c *gin.Context) {
-    		rows, _ := db.Conn.Query("SELECT short_code, visit_count FROM urls ORDER BY visit_count DESC LIMIT 5")
-    		defer rows.Close()
+    		rows, err := db.Conn.Query("SELECT short_code, visit_count FROM urls ORDER BY visit_count DESC LIMIT 5")
+    		if err != nil {
+        		c.HTML(http.StatusOK, "index.html", gin.H{
+            			"Links": []interface{}{},
+            			"Error": "Gagal mengambil data dari database",
+        		})
+        		return
+    		}
+
+   		 defer rows.Close()
 
     		type LinkInfo struct {
         		ShortCode  string
@@ -28,11 +36,13 @@ func SetupRouter(db *storage.DB, rdb *storage.RedisClient) *gin.Engine {
 
     		for rows.Next() {
         		var l LinkInfo
-        		rows.Scan(&l.ShortCode, &l.VisitCount)
-       			links = append(links, l)
+        		if err := rows.Scan(&l.ShortCode, &l.VisitCount); err != nil {
+            			continue
+        		}
+        		links = append(links, l)
     		}
 
-    		c.HTML(http.StatusOK, "index.html", gin.H{
+  	  	c.HTML(http.StatusOK, "index.html", gin.H{
         		"Links": links,
     		})
 	})
