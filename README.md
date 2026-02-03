@@ -23,4 +23,3 @@ Sistem ini menggunakan alur **Cache-Aside Pattern**:
 1. Request masuk -> Cek **Redis**.
 2. Jika ada (Cache Hit): Langsung redirect.
 3. Jika tidak ada (Cache Miss): Cek **PostgreSQL**, simpan ke Redis untuk akses berikutnya, lalu redirect.
-# url-shortener
